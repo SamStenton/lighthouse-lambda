@@ -1,0 +1,25 @@
+{
+  "name": "lighthouse-chkr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lighthouse": "^3.0.3",
+    "source-map-support": "^0.5.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.55",
+    "@babel/preset-env": "^7.0.0-beta.55",
+    "aws-sdk": "^2.286.2",
+    "babel-loader": "^8.0.0-beta.4",
+    "serverless-plugin-chrome": "^1.0.0-51",
+    "serverless-webpack": "^5.2.0",
+    "webpack": "^4.16.4",
+    "webpack-node-externals": "^1.7.2"
+  }
+}
