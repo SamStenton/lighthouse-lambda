@@ -13,13 +13,13 @@ custom: ${file(./config.yml)}
 #
 # Happy Coding!
 
-service: ${self:custom.serviceName} # NOTE: update this with your service name
+service: serverless-lighthouse-lambda # NOTE: update this with your service name
 
 provider:
   name: aws
   runtime: nodejs8.10
   stage: ${opt:stage, 'dev'}
-  region: ${self:custom.awsRegion}
+  region: eu-west-1
   timeout: 3
   iamRoleStatements:
   - Effect: Allow
@@ -42,7 +42,7 @@ plugins:
 
 functions:
   main:
-    handler: functions/handler.main
+    handler: handler.main
     memorySize: 128
     events: # All events associated with this function
       - http:
@@ -51,7 +51,7 @@ functions:
     environment:
       LIGHTHOUSE_FUNC: ${self:service}-${self:provider.stage}-lighthouse # Provides a reference to the bellow function
   lighthouse:
-    handler: functions/lighthouse.main
+    handler: lighthouse.main
     memorySize: 512
     timeout: 60
 
