@@ -1,0 +1,12 @@
+# UPDATE THIS FILE!
+
+serviceName: 'lighthouse-checker' # Once set do not change before running `serverless remove`
+reportBucket: 'lighthouse-checker-reports' # Name of the bucket to upload Lighthouse checks to
+awsRegion: 'eu-west-1'
+
+chrome:
+  flags:
+    - --headless
+    - --ignore-certificate-errors
+  functions:
+    - lighthouse # Only inject chrome on the lighthouse funtion

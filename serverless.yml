@@ -1,3 +1,5 @@
+custom: ${file(./config.yml)}
+
 # Welcome to Serverless!
 #
 # This file is the main config file for your service.
@@ -11,42 +13,55 @@
 #
 # Happy Coding!
 
-service: lighthouse-chck # NOTE: update this with your service name
-
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
-# frameworkVersion: "=X.X.X"
+service: ${self:custom.serviceName} # NOTE: update this with your service name
 
 provider:
   name: aws
   runtime: nodejs8.10
-  region: eu-west-2
-  timeout: 30s
-  memorySize: 512
-
+  stage: ${opt:stage, 'dev'}
+  region: ${self:custom.awsRegion}
+  timeout: 3
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - lambda:InvokeFunction
+      - lambda:InvokeAsync
+    Resource: "*"
+  - Effect: Allow
+    Action: 
+      - s3:PutObject
+      - s3:PutObjectAcl
+    Resource: "arn:aws:s3:::${self:custom.reportBucket}/*"
   environment:
-    DEBUG: "*"
-    BUCKET: 'test'
-
+    REPORT_BUCKET: ${self:custom.reportBucket}
+    REPORT_BUCKET_URL: https://s3.${self:provider.region}.amazonaws.com/${self:provider.environment.REPORT_BUCKET}/
+    # DEBUG: '*' # WARNING: Dubug currently causes an issue with serverless-plugin-chrome 
 
 plugins:
   - serverless-plugin-chrome
-  # - serverless-webpack
 
-
-custom:
-  webpack:
-    webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
-    includeModules: false   # Node modules configuration for packaging
-    packager: 'npm'   # Packager that will be used to package your external modules
-  chrome:
-    flags:
-      - --headless
-      
 functions:
-  hello:
-    handler: handler.main
+  main:
+    handler: functions/handler.main
+    memorySize: 128
     events: # All events associated with this function
       - http:
           method: get
-          path: '/hello'
+          path: '/check'
+    environment:
+      LIGHTHOUSE_FUNC: ${self:service}-${self:provider.stage}-lighthouse # Provides a reference to the bellow function
+  lighthouse:
+    handler: functions/lighthouse.main
+    memorySize: 512
+    timeout: 60
+
+
+resources:
+  Resources:
+    reportBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.REPORT_BUCKET}
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
